@@ -55,12 +55,11 @@ export default function LoginForm() {
   if (username && password && username.length >=5 && password.length >=5) {
     try {
       // Send form data to the API
-      const response = await fetch('/Data/login-data.json', {
+      const response = await fetch('http://localhost:3000/SignUp', {
         method: 'GET',
         headers: {
-          'Content-Type': 'application/json',
+          'Content-Type': 'application/json', 
         },
-        body: JSON.stringify({ username, password }),
       });
 
       const result = await response.json();
