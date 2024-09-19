@@ -13,6 +13,7 @@ import EditIcon from '@mui/icons-material/Edit';
 import DeleteIcon from '@mui/icons-material/Delete';
 import TableChartIcon from '@mui/icons-material/TableChart';
 import LeadForm from "../Forms/leadform";
+import LeadKanban from "../kanban/leadkanban";
 
 
 
@@ -30,9 +31,9 @@ const Leads = () => {
 
   const [filteredRows, setFilteredRows] = useState([]);
 
-  const [filterByLeadStatus, setFilterByLeadStatus] = useState(""); 
+  const [filterByLeadStatus, setFilterByLeadStatus] = useState("");
 
-  
+
   const [counts, setCounts] = useState({
     NotContacted: 0,
     Contacted: 0,
@@ -52,7 +53,7 @@ const Leads = () => {
     const date = now.toLocaleDateString('en-GB'); // Adjust the locale to 'en-GB' for DD/MM/YYYY format or change as required
     const time = now.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', second: '2-digit' }); // HH:MM:SS format
     const timestamp = `${date} ${time}`; // Combine date and time
-    
+
     // Add timestamp to the lead data
     const leadWithTimestamp = { ...formData, createdOn: timestamp };
     setRows((prevRows) => [leadWithTimestamp, ...prevRows]);
@@ -68,8 +69,8 @@ const Leads = () => {
     setIsFormVisible(false);
   };
 
- 
- 
+
+
 
   const handleColorChange1 = () => {
     setIsBlue1((prev) => !prev); // Toggle color for first button
@@ -108,17 +109,18 @@ const Leads = () => {
     // Fetch the data from the JSON file
     fetch('http://localhost:3000/Leads')
       .then(response => response.json())
-      .then(data =>{ setRows(data);
+      .then(data => {
+        setRows(data);
         setFilteredRows(data);
-      
+
       })
       .catch(error => console.error('Error fetching data:', error));
   }, []);
 
 
   useEffect(() => {
-    let filteredData = rows.filter((row) => 
-      row.name.toLowerCase().includes(searchQuery.toLowerCase()) && 
+    let filteredData = rows.filter((row) =>
+      row.name.toLowerCase().includes(searchQuery.toLowerCase()) &&
       (filterByLeadStatus === "" || row.leadStatus === filterByLeadStatus)
     );
     setFilteredRows(filteredData);
@@ -129,7 +131,7 @@ const Leads = () => {
       WarmLead: filteredData.filter(row => row.leadStatus === "Warm Lead").length,
       ColdLead: filteredData.filter(row => row.leadStatus === "Cold Lead").length,
     };
-    
+
     setCounts(updatedCounts);
 
   }, [searchQuery, filterByLeadStatus, rows]);
@@ -138,12 +140,12 @@ const Leads = () => {
   const handleSearchChange = (e) => {
     const query = e.target.value.toLowerCase();
     setSearchQuery(query);
-    
+
     // Filter rows based on the search query
     const filtered = rows.filter((row) =>
       row.name.toLowerCase().includes(query)
     );
-    
+
     setFilteredRows(filtered);
   };
 
@@ -163,7 +165,20 @@ const Leads = () => {
       })
       .catch(error => console.error('Error in delete request:', error));
   };
-  
+
+
+  const [isTableVisible, setIsTableVisisble] = useState(false);
+  const [isKanbanVisible , setIsKanbanVisible]=useState(false);
+
+  const openTable = () => {
+    setIsTableVisisble(true);
+    setIsKanbanVisible(false);
+  }
+
+  const closeTable = () => {
+    setIsTableVisisble(false);
+    setIsKanbanVisible(true);
+  }
 
   return (
 
@@ -228,7 +243,7 @@ const Leads = () => {
           <input
             type="search"
             placeholder="search"
-            onChange={ handleSearchChange}
+            onChange={handleSearchChange}
             className="border-1 border-slate-600 bg-gray-200 rounded-full pl-10 pr-4 py-1"
           />
           <SearchIcon className="absolute top-1/2 left-3 transform -translate-y-1/2 text-slate-600" />
@@ -240,11 +255,11 @@ const Leads = () => {
           <Menu as="div" className="relative inline-block text-left">
             <div>
               <MenuButton
-                onClick={ handleColorChange1}
+                onClick={handleColorChange1}
                 className={`inline-flex w-full justify-center items-center gap-x-1.5 rounded-md  px-3 py-1 text-sm  font-semibold text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 transition-colors duration-300 ${isBlue1 ? 'bg-blue-500 text-white ' : 'bg-white text-gray-900'}`}>
                 Not Contacted
                 <div className=" flex w-[28px] h-[28px] items-center bg-red-400 justify-center rounded-full text-sm ">
-                {counts.NotContacted}
+                  {counts.NotContacted}
                 </div>
               </MenuButton>
             </div>
@@ -253,11 +268,11 @@ const Leads = () => {
           <Menu as="div" className="relative inline-block text-left">
             <div>
               <MenuButton
-              onClick={handleColorChange2}
-               className={`inline-flex w-full justify-center items-center gap-x-1.5 rounded-md  px-3 py-1 text-sm  font-semibold text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 transition-colors duration-300 ${isBlue2 ? 'bg-blue-500 text-white' : 'bg-light'}`}>
+                onClick={handleColorChange2}
+                className={`inline-flex w-full justify-center items-center gap-x-1.5 rounded-md  px-3 py-1 text-sm  font-semibold text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 transition-colors duration-300 ${isBlue2 ? 'bg-blue-500 text-white' : 'bg-light'}`}>
                 Contacted
                 <div className=" flex w-[28px] h-[28px] items-center bg-red-400 justify-center rounded-full text-sm ">
-                {counts.Contacted}
+                  {counts.Contacted}
                 </div>
 
               </MenuButton>
@@ -268,11 +283,11 @@ const Leads = () => {
           <Menu as="div" className="relative inline-block text-left">
             <div>
               <MenuButton
-              onClick={handleColorChange3}
-              className={ `inline-flex w-full justify-center items-center gap-x-1.5 rounded-md  px-3 py-1 text-sm  font-semibold text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 transition-colors duration-300 ${isBlue3 ? 'bg-blue-500 text-white ' : 'bg-light'}`}>
+                onClick={handleColorChange3}
+                className={`inline-flex w-full justify-center items-center gap-x-1.5 rounded-md  px-3 py-1 text-sm  font-semibold text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 transition-colors duration-300 ${isBlue3 ? 'bg-blue-500 text-white ' : 'bg-light'}`}>
                 Warm Lead
                 <div className=" flex w-[28px] h-[28px] items-center bg-red-400 justify-center rounded-full text-sm ">
-                {counts.WarmLead}
+                  {counts.WarmLead}
                 </div>
 
               </MenuButton>
@@ -281,12 +296,12 @@ const Leads = () => {
 
           <Menu as="div" className="relative inline-block text-left">
             <div>
-              <MenuButton 
-              onClick={handleColorChange4}
-              className={`inline-flex w-full justify-center items-center gap-x-1.5 rounded-md  px-3 py-1 text-sm  font-semibold text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 transition-colors duration-300 ${isBlue4 ? 'bg-blue-500 text-white' : 'bg-light'}`}>
-               Cold Lead
+              <MenuButton
+                onClick={handleColorChange4}
+                className={`inline-flex w-full justify-center items-center gap-x-1.5 rounded-md  px-3 py-1 text-sm  font-semibold text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 transition-colors duration-300 ${isBlue4 ? 'bg-blue-500 text-white' : 'bg-light'}`}>
+                Cold Lead
                 <div className=" flex w-[28px] h-[28px] items-center bg-red-400 justify-center rounded-full text-sm ">
-                {counts.ColdLead}
+                  {counts.ColdLead}
                 </div>
               </MenuButton>
             </div>
@@ -297,9 +312,12 @@ const Leads = () => {
 
         <div className="flex py-2 gap-1 ">
 
-          <div className="flex w-[90px] items-center justify-around gap-1 border-2 bg-light  text-sm p-1 rounded-full hover:bg-blue-500 hover:text-white">
+          <div
+            onClick={openTable}
+            className="flex w-[90px] items-center justify-around gap-1 border-2 bg-light  text-sm p-1 rounded-full hover:bg-blue-500 hover:text-white">
             <TableChartIcon className="w-4 h-4" />
             <button>table</button>
+
           </div>
 
           <div className="flex  w-[90px] items-center justify-between gap-1 border-2 bg-light  text-sm p-1 rounded-full hover:bg-blue-500 hover:text-white">
@@ -310,64 +328,76 @@ const Leads = () => {
 
       </div>
 
-      <div className=" flex items-center justify-center w-full h-full m-auto p-1 border-2 border-gray-100 rounded-md">
-        <table className='border-2  text-center table-auto   text-sm capitalize text-semibold w-full rounded-md' >
-          <thead>
-            <tr className='border-2 bg-rose-200 p-5'>
-              <th className='border-2 px-3'>created On</th>
-              <th className='border-2 px-3' >Name</th>
-              <th className='border-2 px-3'>Lead Status</th>
-              <th className='border-2 px-3'>Phone</th>
-              <th className='border-2 px-3'>Email</th>
-              <th className='border-2 px-3'>Stack</th>
-              <th className='border-2 px-3'>Course</th>
-              <th className='border-2 px-3'>Update</th>
-              <th className='border-2 px-3'>Delete</th>
-            </tr>
-          </thead>
-          <tbody>
-            {filteredRows.length === 0 ? (
-              <tr>
-                <td colSpan="11">No data available</td>
-              </tr>
-            ) : (
-              filteredRows.map((row, index) => (
-                <tr key={index} className="bg-green-100">
-                  <td className="border-2 p-2 ">{row.createdOn}</td> {/* New column data not exising in form */}
-                  <td className='border-2 p-2'>{row.name}</td>
-                  <td className='border-2 p-2'>{row.leadStatus}</td>
-                  <td className='border-2 p-2'>{row.phone}</td>
-                  <td className='border-2 p-2'>{row.email}</td>
-                  <td className='border-2 p-2'>{row.stack}</td>
-                  <td className='border-2 p-2'>{row.course}</td>
-                  <td className='border-2 px-3'>
-                    <div className="flex  items-center">
-                    <button
-                    onClick={''}
-                     className="w-[70px] justify-center items-center text-green-700 flex border-1 bg-gray-200 rounded-md">
-                      <EditIcon className=" w-[20px] h-[20px]" />
-                      <p>Update</p>
-                      </button>
-                    </div>
-                  </td>
 
-                  <td className='border-2 px-3'>
-                    <div className="flex  items-center">
-                      <button
-                       onClick={() => handleDelete(row.id)} 
-                       className=" w-[70px] justify-center items-center text-red-600 flex border-1 bg-gray-200 rounded-md">
-                      <DeleteIcon className="w-[20px] h-[20px]" />
-                      <p>Delete</p>
-                      </button>
-                    </div>
-                  </td>
+
+
+      <div>
+        {isTableVisible  &&
+
+          <div className=" flex items-center justify-center w-full h-full m-auto p-1 border-2 border-gray-100 rounded-md">
+            <table className='border-2  text-center table-auto   text-sm capitalize text-semibold w-full rounded-md' >
+              <thead>
+                <tr className='border-2 bg-rose-200 p-5'>
+                  <th className='border-2 px-3'>created On</th>
+                  <th className='border-2 px-3' >Name</th>
+                  <th className='border-2 px-3'>Lead Status</th>
+                  <th className='border-2 px-3'>Phone</th>
+                  <th className='border-2 px-3'>Email</th>
+                  <th className='border-2 px-3'>Stack</th>
+                  <th className='border-2 px-3'>Course</th>
+                  <th className='border-2 px-3'>Update</th>
+                  <th className='border-2 px-3'>Delete</th>
                 </tr>
-              ))
-            )}
-          </tbody>
-        </table>
+              </thead>
+              <tbody>
+                {filteredRows.length === 0 ? (
+                  <tr>
+                    <td colSpan="11">No data available</td>
+                  </tr>
+                ) : (
+                  filteredRows.map((row, index) => (
+                    <tr key={index} className="bg-green-100">
+                      <td className="border-2 p-2 ">{row.createdOn}</td> {/* New column data not exising in form */}
+                      <td className='border-2 p-2'>{row.name}</td>
+                      <td className='border-2 p-2'>{row.leadStatus}</td>
+                      <td className='border-2 p-2'>{row.phone}</td>
+                      <td className='border-2 p-2'>{row.email}</td>
+                      <td className='border-2 p-2'>{row.stack}</td>
+                      <td className='border-2 p-2'>{row.course}</td>
+                      <td className='border-2 px-3'>
+                        <div className="flex  items-center">
+                          <button
+                            onClick={''}
+                            className="w-[70px] justify-center items-center text-green-700 flex border-1 bg-gray-200 rounded-md">
+                            <EditIcon className=" w-[20px] h-[20px]" />
+                            <p>Update</p>
+                          </button>
+                        </div>
+                      </td>
+
+                      <td className='border-2 px-3'>
+                        <div className="flex  items-center">
+                          <button
+                            onClick={() => handleDelete(row.id)}
+                            className=" w-[70px] justify-center items-center text-red-600 flex border-1 bg-gray-200 rounded-md">
+                            <DeleteIcon className="w-[20px] h-[20px]" />
+                            <p>Delete</p>
+                          </button>
+                        </div>
+                      </td>
+                    </tr>
+                  ))
+                )}
+              </tbody>
+            </table>
+          </div>
+        }
+        {
+          isKanbanVisible &&
+          <LeadKanban/>
+        }
       </div>
-    </div>
+   </div>
 
 
 

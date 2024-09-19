@@ -4,7 +4,7 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faIdCard } from '@fortawesome/free-solid-svg-icons';
 
 
-export default function learnForm({ closeForm, handleAddLead }) {
+export default function LearnForm({ closeForm, handleAddLead }) {
     const [filteredRows, setFilteredRows] = useState([]);
     const [formData, setFormData] = useState({
         firstName: '',
